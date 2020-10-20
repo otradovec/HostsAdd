@@ -8,6 +8,8 @@ public class Main {
     //podle abecedy
      public static void main(String[] args) {
          new Main().start(args[0],args[1]);
+         System.out.println("Input file: "+ args[0]);
+         System.out.println("main hosts file: "+ args[1]);
     }
 
     public void start(String inputFileName, String hostsFileName) {
@@ -17,6 +19,12 @@ public class Main {
     }
 
     public void start(File inputFile, File hostsFile){
+        if (inputFile==null){
+            System.out.println("Nothing1!!!!!!!!!!1");
+        }else {
+            System.out.println(inputFile.getName());
+            System.out.println(inputFile.getAbsolutePath());
+        }
         if (inputFile.exists()) {
             if (inputFile.canRead()){
                 if (hostsFile.exists()) {

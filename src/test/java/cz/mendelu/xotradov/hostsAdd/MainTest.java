@@ -7,6 +7,6 @@ public class MainTest {
 
     @Test
     public void start() {
-        new Main().start("newHosts.txt", "cz/mendelu/xotradov/hostsAdd/hosts.txt");
+        new Main().start( "src/test/resources/cz/mendelu/xotradov/hostsAdd/newHosts.txt", "src/test/resources/cz/mendelu/xotradov/hostsAdd/hosts.txt");
     }
 }
