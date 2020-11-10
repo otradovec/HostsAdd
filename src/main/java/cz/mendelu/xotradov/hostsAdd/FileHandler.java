@@ -96,4 +96,33 @@ public class FileHandler {
     public File getOutputFile() {
         return outputFile;
     }
+
+    public String getContent(File file){
+        RandomAccessFile randomAccessFile;
+        try {
+            randomAccessFile= new RandomAccessFile(file,"r");
+            String result = getUnsafeContent(randomAccessFile);
+            randomAccessFile.close();
+            return result;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    private String getUnsafeContent(RandomAccessFile randomAccessFile) throws IOException {
+        String newLine = randomAccessFile.readLine();
+        String result = "";
+        if (newLine !=null){
+            result = result.concat(newLine);
+            newLine = randomAccessFile.readLine();
+            while (newLine != null){
+                result = result.concat("\n");
+                result = result.concat(newLine);
+                newLine = randomAccessFile.readLine();
+            }
+        }
+        return result;
+    }
+
 }

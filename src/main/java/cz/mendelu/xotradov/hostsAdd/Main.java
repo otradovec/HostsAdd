@@ -36,7 +36,6 @@ public class Main {
                     addLine(rightLine);
                 }
             }
-            // note that Scanner suppresses exceptions
             if (sc.ioException() != null) {
                 throw sc.ioException();
             }
