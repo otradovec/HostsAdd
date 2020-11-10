@@ -1,3 +1,0 @@
-0.0.0.0 ct24.ceskatelevize.cz
-0.0.0.0 jenda.cz
-0.0.0.0 zorka.eu

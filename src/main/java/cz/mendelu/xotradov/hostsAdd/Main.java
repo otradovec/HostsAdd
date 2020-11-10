@@ -1,47 +1,31 @@
 package cz.mendelu.xotradov.hostsAdd;
 
 import java.io.*;
-import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Scanner;
 
 public class Main {
+    private FileHandler fileHandler;
     ArrayList<String> inputList = new ArrayList<>();
-    //podle abecedy
-    //nacist nove radky usporadane
-    //chanelem doplnit
+    //ToDo podle abecedy
+    //ToDo nacist nove radky usporadane
+    //ToDo chanelem doplnit
      public static void main(String[] args) {
-         new Main().start(args[0],args[1]);
+         new Main(args[0],args[1]).start();
          System.out.println("Input file: "+ args[0]);
          System.out.println("main hosts file: "+ args[1]);
     }
-
-    public void start(String inputFileName, String hostsFileName) {
-        File inputFile = new File(inputFileName);
-        File hostsFile = new File(hostsFileName);
-        start(inputFile,hostsFile);
+    public Main (String inputFileName, String hostsFileName){
+         fileHandler = new FileHandler(inputFileName,hostsFileName);
+    }
+    public void start() {
+        File inputFile = fileHandler.getInputFile();
+        File hostsFile = fileHandler.getOutputFile();
+        handle(inputFile,hostsFile);
     }
 
-    public void start(File inputFile, File hostsFile){
-        if (inputFile.exists()) {
-            if (inputFile.canRead()){
-                if (hostsFile.exists()) {
-                    if (hostsFile.canWrite()){
-                        handle(inputFile,hostsFile);
-                    }else {
-                        System.out.println("The second file cannot be written to.");
-                    }
-                } else {
-                    System.out.println("The second file does not exist. Second argument is file to be read from.");
-                }
-            }else {
-                System.out.println("The first file cannot be read.");
-            }
-        } else {
-            System.out.println("The first file does not exist. First argument is file to be read from.");
-        }
-    }
+
     private void handle(File inputFile, File hostsFile) {
         try (FileInputStream inputStream = new FileInputStream(inputFile); Scanner sc = new Scanner(inputStream, "UTF-8")) {
             while (sc.hasNextLine()) {
@@ -64,72 +48,52 @@ public class Main {
     }
 
     private void addLines(File hostsFile) {
-        RandomAccessFile r = null;
-        RandomAccessFile rtemp = null;
         try {
-            //ToDo just read
-             r = new RandomAccessFile(hostsFile, "rw");
-             File tempFile = new File(hostsFile.getName() + "~");
-             tempFile.delete();
-             rtemp = new RandomAccessFile(tempFile, "rw");
-            r.seek(0);
-            String line = r.readLine();
-            while ((line) != null && !inputList.isEmpty()){
+            String line = fileHandler.getMainHostsFile().readLine();
+            while (bothFilesHaveLines(line)){
                 //input is lower
                 if (isFirstBeforeSecond(inputList.get(0),line)){
-                    rtemp.write((inputList.get(0)+"\n").getBytes());
+                    fileHandler.writeToTemp((inputList.get(0)+"\n").getBytes());
                     inputList.remove(0);
                 }else {
                     //line is lower
-                    rtemp.write((line+"\n").getBytes());
-                    line = r.readLine();
+                    fileHandler.writeToTemp((line+"\n").getBytes());
+                    line = fileHandler.getMainHostsFile().readLine();
                 }
             }
-            //one of the files might have unresolved hosts
-            if ((line) != null){
-                while ((line) != null || !inputList.isEmpty()){
-                    rtemp.write((line+"\n").getBytes());
-                    line = r.readLine();
-                }
-            }else if (!inputList.isEmpty()){
-                while ((line) != null || !inputList.isEmpty()){
-                    rtemp.write((inputList.get(0)+"\n").getBytes());
-                    inputList.remove(0);
-                }
-            }
-            System.out.println("Just");
-            r.close();
-            rtemp.close();
-            //copy to
-            System.out.println("Just2");
-            copyFileUsingChannel(tempFile,hostsFile);
+            resolvePossibleRemainingLinesInOneOfTheFiles(fileHandler.getMainHostsFile(), line);
+            fileHandler.closeAllFiles();
+            fileHandler.copyTempToFileUsingChannel(hostsFile);
         } catch (Exception e) {
-            try {
-                r.close();
-                rtemp.close();
-            } catch (Exception e1){
-                e.printStackTrace();
-            }
+                fileHandler.closeAllFiles();
         }
 
     }
 
-    public boolean isFirstBeforeSecond(String first, String second) {
+    private void resolvePossibleRemainingLinesInOneOfTheFiles
+            (RandomAccessFile mainHostsFile, String line) throws IOException {
+        if ((line) != null){
+            while ((line) != null || !inputList.isEmpty()){
+                fileHandler.writeToTemp((line+"\n").getBytes());
+                line = mainHostsFile.readLine();
+            }
+        }else if (!inputList.isEmpty()){
+            while ((line) != null || !inputList.isEmpty()){
+                fileHandler.writeToTemp((inputList.get(0)+"\n").getBytes());
+                inputList.remove(0);
+            }
+        }
+    }
+
+    private boolean bothFilesHaveLines(String line) {
+        return (line) != null && !inputList.isEmpty();
+    }
+
+    public static boolean isFirstBeforeSecond(String first, String second) {
         return first.compareTo(second)<0;
     }
 
-    private void copyFileUsingChannel(File source, File dest) throws IOException {
-        FileChannel sourceChannel = null;
-        FileChannel destChannel = null;
-        try {
-            sourceChannel = new FileInputStream(source).getChannel();
-            destChannel = new FileOutputStream(dest).getChannel();
-            destChannel.transferFrom(sourceChannel, 0, sourceChannel.size());
-        }finally{
-            sourceChannel.close();
-            destChannel.close();
-        }
-    }
+
     private boolean isPresent(String rightLine, File hostsFile) {
         try (FileInputStream inputStream = new FileInputStream(hostsFile); Scanner sc = new Scanner(inputStream, "UTF-8")) {
             while (sc.hasNextLine()) {
@@ -162,5 +126,9 @@ public class Main {
     }
     private String getHostsTypeLine(String cleanedLine) {
          return "0.0.0.0 "+cleanedLine;
+    }
+
+    public FileHandler getFileHandler() {
+        return fileHandler;
     }
 }
