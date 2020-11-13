@@ -8,10 +8,7 @@ import java.util.Scanner;
 public class Main {
     private FileHandler fileHandler;
     ArrayList<String> inputList = new ArrayList<>();
-    //ToDo podle abecedy
-    //ToDo nacist nove radky usporadane
-    //ToDo chanelem doplnit
-     public static void main(String[] args) {
+    public static void main(String[] args) {
          new Main(args[0],args[1]).start();
          System.out.println("Input file: "+ args[0]);
          System.out.println("main hosts file: "+ args[1]);
@@ -24,7 +21,6 @@ public class Main {
         File hostsFile = fileHandler.getOutputFile();
         handle(inputFile,hostsFile);
     }
-
 
     private void handle(File inputFile, File hostsFile) {
         try (FileInputStream inputStream = new FileInputStream(inputFile); Scanner sc = new Scanner(inputStream, "UTF-8")) {
@@ -66,7 +62,6 @@ public class Main {
         } catch (Exception e) {
                 fileHandler.closeAllFiles();
         }
-
     }
 
     private void resolvePossibleRemainingLinesInOneOfTheFiles
@@ -91,7 +86,6 @@ public class Main {
     public static boolean isFirstBeforeSecond(String first, String second) {
         return first.compareTo(second)<0;
     }
-
 
     private boolean isPresent(String rightLine, File hostsFile) {
         try (FileInputStream inputStream = new FileInputStream(hostsFile); Scanner sc = new Scanner(inputStream, "UTF-8")) {
@@ -124,7 +118,7 @@ public class Main {
         return newLine;
     }
     private String getHostsTypeLine(String cleanedLine) {
-         return "0.0.0.0 "+cleanedLine;
+         return "0.0.0.0       "+cleanedLine;
     }
 
     public FileHandler getFileHandler() {
