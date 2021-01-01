@@ -28,7 +28,7 @@ public class Main {
                 String line = sc.nextLine();
                 String cleanedLine = getCleaned(line);
                 String rightLine= getHostsTypeLine(cleanedLine);
-                if (!isPresent(rightLine,hostsFile)){
+                if (isGoodToAdd(rightLine,hostsFile)){
                     addLine(rightLine);
                 }
             }
@@ -40,6 +40,10 @@ public class Main {
         }
         Collections.sort(inputList);
         addLines(hostsFile);
+    }
+
+    private boolean isGoodToAdd(String rightLine,File hostsFile) {
+        return !isPresent(rightLine,hostsFile) && !isPresent(rightLine,inputList);
     }
 
     private void addLines(File hostsFile) {
@@ -99,6 +103,10 @@ public class Main {
         } catch (IOException ignored) {
             return false;
         }
+    }
+
+    private boolean isPresent(String line, ArrayList<String> list){
+        return list.contains(line);
     }
 
     private void addLine(String rightLine) {
