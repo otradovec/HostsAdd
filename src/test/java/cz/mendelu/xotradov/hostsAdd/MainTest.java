@@ -5,7 +5,6 @@ import org.junit.Test;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.RandomAccessFile;
 
 import static org.junit.Assert.*;
 
@@ -65,10 +64,6 @@ public class MainTest {
                 "0.0.0.0       zorka.eu\n";
         createSafelyNewHostsFiles(inputFilePath,outputFilePath,inputFileContent,oldHostsContent);
         Main main = new Main(inputFilePath,outputFilePath);
-        File outputFile = main.getFileHandler().getOutputFile();
-        File inputFile = main.getFileHandler().getInputFile();
-        assertEquals(outputFilePath,outputFile.getPath());
-        assertEquals(inputFilePath,inputFile.getPath());
         main.start();
         assertEquals("0.0.0.0       ct24.ceskatelevize.cz\n" +
                         "0.0.0.0       info.cz\n" +
