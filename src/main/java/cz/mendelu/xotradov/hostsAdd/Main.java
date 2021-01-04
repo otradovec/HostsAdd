@@ -26,10 +26,12 @@ public class Main {
         try (FileInputStream inputStream = new FileInputStream(inputFile); Scanner sc = new Scanner(inputStream, "UTF-8")) {
             while (sc.hasNextLine()) {
                 String line = sc.nextLine();
-                String cleanedLine = getCleaned(line);
-                String rightLine= getHostsTypeLine(cleanedLine);
-                if (isGoodToAdd(rightLine,hostsFile)){
-                    addLine(rightLine);
+                if (isURL(line)){
+                    String cleanedLine = getCleaned(line);
+                    String rightLine= getHostsTypeLine(cleanedLine);
+                    if (isGoodToAdd(rightLine,hostsFile)){
+                        addLine(rightLine);
+                    }
                 }
             }
             if (sc.ioException() != null) {
@@ -44,6 +46,11 @@ public class Main {
 
     private boolean isGoodToAdd(String rightLine,File hostsFile) {
         return !isPresent(rightLine,hostsFile) && !isPresent(rightLine,inputList);
+    }
+
+    private boolean isURL(String possibleURL) {
+        String trimmed = possibleURL.trim();
+        return !trimmed.equals("");
     }
 
     private void addLines(File hostsFile) {

@@ -74,6 +74,118 @@ public class MainTest {
                 getHostsContent(main.getFileHandler()));
     }
 
+    @Test
+    public void blankLineInInput(){
+        String inputFilePath = "src/test/resources/cz/mendelu/xotradov/hostsAdd/newHosts.txt";
+        String outputFilePath = "src/test/resources/cz/mendelu/xotradov/hostsAdd/hosts.txt";
+        deleteHostsFiles(inputFilePath,outputFilePath);
+        String inputFileContent = "https://ct24.ceskatelevize.cz/\n" +
+                "\n" +
+                "http://seznam.cz\n" +
+                "https://zpravy.magazinplus.cz/1961-predpoklady-se-potvrdily-puvod-koronaviru-je-stale-jasnejsi.html?utm_source=www.seznam.cz&utm_medium=sekce-z-internetu#dop_ab_variant=413311&dop_req_id=FkukFJgP7Se-202010190802&dop_source_zone_name=hpfeed.sznhp.box\n" +
+                "info.cz";
+        String oldHostsContent = "0.0.0.0       ct24.ceskatelevize.cz\n" +
+                "0.0.0.0       jenda.cz\n" +
+                "0.0.0.0       zorka.eu\n";
+        createSafelyNewHostsFiles(inputFilePath,outputFilePath,inputFileContent,oldHostsContent);
+        Main main = new Main(inputFilePath,outputFilePath);
+        main.start();
+        assertEquals("0.0.0.0       ct24.ceskatelevize.cz\n" +
+                        "0.0.0.0       info.cz\n" +
+                        "0.0.0.0       jenda.cz\n" +
+                        "0.0.0.0       seznam.cz\n" +
+                        "0.0.0.0       zorka.eu\n" +
+                        "0.0.0.0       zpravy.magazinplus.cz",
+                getHostsContent(main.getFileHandler()));
+    }
+
+    @Test
+    public void blankLines(){
+        String inputFilePath = "src/test/resources/cz/mendelu/xotradov/hostsAdd/newHosts.txt";
+        String outputFilePath = "src/test/resources/cz/mendelu/xotradov/hostsAdd/hosts.txt";
+        deleteHostsFiles(inputFilePath,outputFilePath);
+        String inputFileContent = "https://ct24.ceskatelevize.cz/\n" +
+                "\n" +
+                "http://seznam.cz\n" +
+                "\n" +
+                "\n" +
+                "https://zpravy.magazinplus.cz/1961-predpoklady-se-potvrdily-puvod-koronaviru-je-stale-jasnejsi.html?utm_source=www.seznam.cz&utm_medium=sekce-z-internetu#dop_ab_variant=413311&dop_req_id=FkukFJgP7Se-202010190802&dop_source_zone_name=hpfeed.sznhp.box\n" +
+                "info.cz";
+        String oldHostsContent = "0.0.0.0       ct24.ceskatelevize.cz\n" +
+                "0.0.0.0       jenda.cz\n" +
+                "0.0.0.0       zorka.eu\n";
+        createSafelyNewHostsFiles(inputFilePath,outputFilePath,inputFileContent,oldHostsContent);
+        Main main = new Main(inputFilePath,outputFilePath);
+        main.start();
+        assertEquals("0.0.0.0       ct24.ceskatelevize.cz\n" +
+                        "0.0.0.0       info.cz\n" +
+                        "0.0.0.0       jenda.cz\n" +
+                        "0.0.0.0       seznam.cz\n" +
+                        "0.0.0.0       zorka.eu\n" +
+                        "0.0.0.0       zpravy.magazinplus.cz",
+                getHostsContent(main.getFileHandler()));
+    }
+
+    @Test
+    public void lineWithSpaceOnly(){
+        String inputFilePath = "src/test/resources/cz/mendelu/xotradov/hostsAdd/newHosts.txt";
+        String outputFilePath = "src/test/resources/cz/mendelu/xotradov/hostsAdd/hosts.txt";
+        deleteHostsFiles(inputFilePath,outputFilePath);
+        String inputFileContent = "https://ct24.ceskatelevize.cz/\n" +
+                " \n" +
+                "http://seznam.cz\n" +
+                "https://zpravy.magazinplus.cz/1961-predpoklady-se-potvrdily-puvod-koronaviru-je-stale-jasnejsi.html?utm_source=www.seznam.cz&utm_medium=sekce-z-internetu#dop_ab_variant=413311&dop_req_id=FkukFJgP7Se-202010190802&dop_source_zone_name=hpfeed.sznhp.box\n" +
+                "info.cz";
+        String oldHostsContent = "0.0.0.0       ct24.ceskatelevize.cz\n" +
+                "0.0.0.0       jenda.cz\n" +
+                "0.0.0.0       zorka.eu\n";
+        createSafelyNewHostsFiles(inputFilePath,outputFilePath,inputFileContent,oldHostsContent);
+        Main main = new Main(inputFilePath,outputFilePath);
+        main.start();
+        assertEquals("0.0.0.0       ct24.ceskatelevize.cz\n" +
+                        "0.0.0.0       info.cz\n" +
+                        "0.0.0.0       jenda.cz\n" +
+                        "0.0.0.0       seznam.cz\n" +
+                        "0.0.0.0       zorka.eu\n" +
+                        "0.0.0.0       zpravy.magazinplus.cz",
+                getHostsContent(main.getFileHandler()));
+    }
+
+    @Test
+    public void linesWithSpacesOnly(){
+        String inputFilePath = "src/test/resources/cz/mendelu/xotradov/hostsAdd/newHosts.txt";
+        String outputFilePath = "src/test/resources/cz/mendelu/xotradov/hostsAdd/hosts.txt";
+        deleteHostsFiles(inputFilePath,outputFilePath);
+        String inputFileContent = "https://ct24.ceskatelevize.cz/\n" +
+                "     \n" +
+                "http://seznam.cz\n" +
+                " \n" +
+                "        \n" +
+                "https://zpravy.magazinplus.cz/1961-predpoklady-se-potvrdily-puvod-koronaviru-je-stale-jasnejsi.html?utm_source=www.seznam.cz&utm_medium=sekce-z-internetu#dop_ab_variant=413311&dop_req_id=FkukFJgP7Se-202010190802&dop_source_zone_name=hpfeed.sznhp.box\n" +
+                "info.cz";
+        String oldHostsContent = "0.0.0.0       ct24.ceskatelevize.cz\n" +
+                "0.0.0.0       jenda.cz\n" +
+                "0.0.0.0       zorka.eu\n";
+        createSafelyNewHostsFiles(inputFilePath,outputFilePath,inputFileContent,oldHostsContent);
+        Main main = new Main(inputFilePath,outputFilePath);
+        main.start();
+        assertEquals("0.0.0.0       ct24.ceskatelevize.cz\n" +
+                        "0.0.0.0       info.cz\n" +
+                        "0.0.0.0       jenda.cz\n" +
+                        "0.0.0.0       seznam.cz\n" +
+                        "0.0.0.0       zorka.eu\n" +
+                        "0.0.0.0       zpravy.magazinplus.cz",
+                getHostsContent(main.getFileHandler()));
+    }
+
+    /*@Test
+    public void alternativeMain(){
+        String inputFilePath = "src/test/resources/cz/mendelu/xotradov/hostsAdd/urlToAdd";
+        String outputFilePath = "src/test/resources/cz/mendelu/xotradov/hostsAdd/HOSTS.txt";
+        Main main = new Main(inputFilePath,outputFilePath);
+        main.start();
+    }*/
+
     private String getHostsContent(FileHandler fileHandler) {
         return fileHandler.getContent(fileHandler.getOutputFile());
     }
