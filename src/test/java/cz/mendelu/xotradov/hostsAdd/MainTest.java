@@ -8,12 +8,20 @@ public class MainTest {
     public static String oldHostsContent =
             "0.0.0.0       ct24.ceskatelevize.cz\n" +
                     "0.0.0.0       jenda.cz\n" +
+                    "0.0.0.0       www.jenda.cz\n" +
                     "0.0.0.0       zorka.eu\n";
+
     public static String resultHosts =
             "0.0.0.0       ct24.ceskatelevize.cz\n" +
                     "0.0.0.0       info.cz\n" +
                     "0.0.0.0       jenda.cz\n" +
                     "0.0.0.0       seznam.cz\n" +
+                    "0.0.0.0       www.ct24.ceskatelevize.cz\n" +
+                    "0.0.0.0       www.info.cz\n" +
+                    "0.0.0.0       www.jenda.cz\n" +
+                    "0.0.0.0       www.seznam.cz\n" +
+                    "0.0.0.0       www.zorka.eu\n" +
+                    "0.0.0.0       www.zpravy.magazinplus.cz\n" +
                     "0.0.0.0       zorka.eu\n" +
                     "0.0.0.0       zpravy.magazinplus.cz";
 

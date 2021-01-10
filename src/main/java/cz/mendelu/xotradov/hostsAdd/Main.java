@@ -3,6 +3,7 @@ package cz.mendelu.xotradov.hostsAdd;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Scanner;
 
 public class Main {
@@ -23,6 +24,13 @@ public class Main {
     }
 
     private void handle(File inputFile, File hostsFile) {
+        addGoodInputLinesToList(inputFile, hostsFile);
+        Collections.sort(inputList);
+        addLines(hostsFile);
+        handleWWW(hostsFile);
+    }
+
+    private void addGoodInputLinesToList(File inputFile, File hostsFile) {
         try (FileInputStream inputStream = new FileInputStream(inputFile); Scanner sc = new Scanner(inputStream, "UTF-8")) {
             while (sc.hasNextLine()) {
                 String line = sc.nextLine();
@@ -40,8 +48,67 @@ public class Main {
         } catch (IOException ignored) {
             System.err.println("IO exception while reading a file");
         }
-        Collections.sort(inputList);
-        addLines(hostsFile);
+    }
+
+    private void handleWWW(File hostsFile) {
+        ArrayList<String> list = getWWWLines(hostsFile);
+        addLines(list,hostsFile);
+    }
+
+    private ArrayList<String> getWWWLines(File file) {
+        ArrayList<String> resultList = new ArrayList<>();
+        try (FileInputStream inputStream = new FileInputStream(file); Scanner sc = new Scanner(inputStream, "UTF-8")) {
+            while (sc.hasNextLine()) {
+                String line = sc.nextLine();
+                if (!startsWithwwwSubdomain(line)){
+                    resultList.add(getLineWithwwwSubdomain(line));
+                }
+            }
+            if (sc.ioException() != null) {
+                throw sc.ioException();
+            }
+        } catch (IOException ignored) {
+            System.err.println("IO exception while reading a file");
+        }
+        return  resultList;
+    }
+
+    private String getLineWithwwwSubdomain(String line) {
+        return getHostsPrefix()+"www."+line.substring(getHostsPrefix().length());
+    }
+
+    private boolean startsWithwwwSubdomain(String line) {
+        return line.startsWith(getHostsPrefix()+"www.");
+    }
+
+    private String getHostsPrefix() {
+        return "0.0.0.0       ";
+    }
+
+    private void addLines(ArrayList<String> list, File hostsFile) {
+        try {
+            String line = fileHandler.getMainHostsFile().readLine();
+            while (bothFilesHaveLines(line,list)){
+                if (list.get(0).equals(line)){
+                    list.remove(0);
+                    fileHandler.writeToTemp((line+"\n").getBytes());
+                    line = fileHandler.getMainHostsFile().readLine();
+                }
+                else if (isFirstBeforeSecond(list.get(0),line)){
+                        fileHandler.writeToTemp((list.get(0)+"\n").getBytes());
+                        list.remove(0);
+                    }else {
+                        //line is lower
+                        fileHandler.writeToTemp((line+"\n").getBytes());
+                        line = fileHandler.getMainHostsFile().readLine();
+                }
+            }
+            resolvePossibleRemainingLinesInOneOfTheFiles(fileHandler.getMainHostsFile(), line);
+            fileHandler.closeAllFiles();
+            fileHandler.copyTempToFileUsingChannel(hostsFile);
+        } catch (Exception e) {
+            fileHandler.closeAllFiles();
+        }
     }
 
     private boolean isGoodToAdd(String rightLine,File hostsFile) {
@@ -54,25 +121,7 @@ public class Main {
     }
 
     private void addLines(File hostsFile) {
-        try {
-            String line = fileHandler.getMainHostsFile().readLine();
-            while (bothFilesHaveLines(line)){
-                //input is lower
-                if (isFirstBeforeSecond(inputList.get(0),line)){
-                    fileHandler.writeToTemp((inputList.get(0)+"\n").getBytes());
-                    inputList.remove(0);
-                }else {
-                    //line is lower
-                    fileHandler.writeToTemp((line+"\n").getBytes());
-                    line = fileHandler.getMainHostsFile().readLine();
-                }
-            }
-            resolvePossibleRemainingLinesInOneOfTheFiles(fileHandler.getMainHostsFile(), line);
-            fileHandler.closeAllFiles();
-            fileHandler.copyTempToFileUsingChannel(hostsFile);
-        } catch (Exception e) {
-                fileHandler.closeAllFiles();
-        }
+        addLines(this.inputList,hostsFile);
     }
 
     private void resolvePossibleRemainingLinesInOneOfTheFiles
@@ -90,8 +139,8 @@ public class Main {
         }
     }
 
-    private boolean bothFilesHaveLines(String line) {
-        return (line) != null && !inputList.isEmpty();
+    private boolean bothFilesHaveLines(String line, List<String> list) {
+        return (line) != null && !list.isEmpty();
     }
 
     public static boolean isFirstBeforeSecond(String first, String second) {
@@ -133,7 +182,7 @@ public class Main {
         return newLine;
     }
     private String getHostsTypeLine(String cleanedLine) {
-         return "0.0.0.0       "+cleanedLine;
+         return getHostsPrefix()+cleanedLine;
     }
 
     public FileHandler getFileHandler() {

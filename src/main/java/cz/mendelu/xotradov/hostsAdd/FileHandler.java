@@ -58,10 +58,21 @@ public class FileHandler {
     }
 
     public RandomAccessFile getMainHostsFile() {
+        if (!raOutputFile.getChannel().isOpen()) {
+            try {
+                raOutputFile = new RandomAccessFile(outputFile, "rw");
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
         return raOutputFile;
     }
 
     public void writeToTemp(byte[] bytes) throws IOException {
+        if (!raTempOutFile.getChannel().isOpen()){
+            tempFile.delete();
+            raTempOutFile = new RandomAccessFile(tempFile, "rw");
+        }
         raTempOutFile.write(bytes);
     }
 
