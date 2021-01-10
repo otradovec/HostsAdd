@@ -136,4 +136,7 @@ public class FileHandler {
         return result;
     }
 
+    public void writeToTemp(String s) throws IOException {
+        writeToTemp(s.getBytes());
+    }
 }

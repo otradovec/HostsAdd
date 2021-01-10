@@ -52,7 +52,7 @@ public class Main {
 
     private void handleWWW(File hostsFile) {
         ArrayList<String> list = getWWWLines(hostsFile);
-        addLines(list,hostsFile);
+        addLines(list);
     }
 
     private ArrayList<String> getWWWLines(File file) {
@@ -85,27 +85,27 @@ public class Main {
         return "0.0.0.0       ";
     }
 
-    private void addLines(ArrayList<String> list, File hostsFile) {
+    private void addLines(ArrayList<String> list) {
         try {
             String line = fileHandler.getMainHostsFile().readLine();
             while (bothFilesHaveLines(line,list)){
                 if (list.get(0).equals(line)){
                     list.remove(0);
-                    fileHandler.writeToTemp((line+"\n").getBytes());
+                    fileHandler.writeToTemp((line+"\n"));
                     line = fileHandler.getMainHostsFile().readLine();
                 }
                 else if (isFirstBeforeSecond(list.get(0),line)){
-                        fileHandler.writeToTemp((list.get(0)+"\n").getBytes());
+                        fileHandler.writeToTemp((list.get(0)+"\n"));
                         list.remove(0);
                     }else {
                         //line is lower
-                        fileHandler.writeToTemp((line+"\n").getBytes());
+                        fileHandler.writeToTemp((line+"\n"));
                         line = fileHandler.getMainHostsFile().readLine();
                 }
             }
             resolvePossibleRemainingLinesInOneOfTheFiles(fileHandler.getMainHostsFile(), line);
             fileHandler.closeAllFiles();
-            fileHandler.copyTempToFileUsingChannel(hostsFile);
+            fileHandler.copyTempToFileUsingChannel(fileHandler.getOutputFile());
         } catch (Exception e) {
             fileHandler.closeAllFiles();
         }
@@ -121,22 +121,21 @@ public class Main {
     }
 
     private void addLines(File hostsFile) {
-        addLines(this.inputList,hostsFile);
+        addLines(this.inputList);
     }
 
     private void resolvePossibleRemainingLinesInOneOfTheFiles
             (RandomAccessFile mainHostsFile, String line) throws IOException {
         if ((line) != null){
             while ((line) != null || !inputList.isEmpty()){
-                fileHandler.writeToTemp((line+"\n").getBytes());
+                fileHandler.writeToTemp((line+"\n"));
                 line = mainHostsFile.readLine();
             }
-        }else if (!inputList.isEmpty()){
-            while ((line) != null || !inputList.isEmpty()){
-                fileHandler.writeToTemp((inputList.get(0)+"\n").getBytes());
+        }else
+            while (!inputList.isEmpty()){
+                fileHandler.writeToTemp((inputList.get(0)+"\n"));
                 inputList.remove(0);
             }
-        }
     }
 
     private boolean bothFilesHaveLines(String line, List<String> list) {
@@ -171,11 +170,8 @@ public class Main {
 
     private String getCleaned(String line){
         String newLine = line;
-        if (newLine.contains("https://")){
-            newLine = newLine.replace("https://","");
-        }else if (newLine.contains("http://")){
-            newLine = newLine.replace("http://","");
-        }
+        newLine = newLine.replace("https://","");
+        newLine = newLine.replace("http://","");
         if (newLine.contains("/")){
             newLine = newLine.substring(0,newLine.indexOf("/"));
         }
