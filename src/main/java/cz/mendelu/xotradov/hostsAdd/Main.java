@@ -103,7 +103,7 @@ public class Main {
                         line = fileHandler.getMainHostsFile().readLine();
                 }
             }
-            resolvePossibleRemainingLinesInOneOfTheFiles(fileHandler.getMainHostsFile(), line);
+            resolvePossibleRemainingLinesInHostsOrLine(line);
             fileHandler.closeAllFiles();
             fileHandler.copyTempToFileUsingChannel(fileHandler.getOutputFile());
         } catch (Exception e) {
@@ -112,7 +112,7 @@ public class Main {
     }
 
     private boolean isGoodToAdd(String rightLine,File hostsFile) {
-        return !isPresent(rightLine,hostsFile) && !isPresent(rightLine,inputList);
+        return !fileHandler.isPresent(rightLine,hostsFile) && !isPresent(rightLine,inputList);
     }
 
     private boolean isURL(String possibleURL) {
@@ -124,12 +124,12 @@ public class Main {
         addLines(this.inputList);
     }
 
-    private void resolvePossibleRemainingLinesInOneOfTheFiles
-            (RandomAccessFile mainHostsFile, String line) throws IOException {
+    private void resolvePossibleRemainingLinesInHostsOrLine
+            (String line) throws IOException {
         if ((line) != null){
             while ((line) != null || !inputList.isEmpty()){
                 fileHandler.writeToTemp((line+"\n"));
-                line = mainHostsFile.readLine();
+                line = fileHandler.getHostsLine();
             }
         }else
             while (!inputList.isEmpty()){
@@ -144,20 +144,6 @@ public class Main {
 
     public static boolean isFirstBeforeSecond(String first, String second) {
         return first.compareTo(second)<0;
-    }
-
-    private boolean isPresent(String rightLine, File hostsFile) {
-        try (FileInputStream inputStream = new FileInputStream(hostsFile); Scanner sc = new Scanner(inputStream, "UTF-8")) {
-            while (sc.hasNextLine()) {
-                String line = sc.nextLine();
-                if (line.equals(rightLine)){
-                    return true;
-                }
-            }
-            return false;
-        } catch (IOException ignored) {
-            return false;
-        }
     }
 
     private boolean isPresent(String line, ArrayList<String> list){

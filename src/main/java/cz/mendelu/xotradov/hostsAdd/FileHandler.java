@@ -2,6 +2,7 @@ package cz.mendelu.xotradov.hostsAdd;
 
 import java.io.*;
 import java.nio.channels.FileChannel;
+import java.util.Scanner;
 
 public class FileHandler {
     private File inputFile;
@@ -138,5 +139,23 @@ public class FileHandler {
 
     public void writeToTemp(String s) throws IOException {
         writeToTemp(s.getBytes());
+    }
+
+    boolean isPresent(String rightLine, File hostsFile) {
+        try (FileInputStream inputStream = new FileInputStream(hostsFile); Scanner sc = new Scanner(inputStream, "UTF-8")) {
+            while (sc.hasNextLine()) {
+                String line = sc.nextLine();
+                if (line.equals(rightLine)){
+                    return true;
+                }
+            }
+            return false;
+        } catch (IOException ignored) {
+            return false;
+        }
+    }
+
+    public String getHostsLine() throws IOException {
+        return raOutputFile.readLine();
     }
 }
